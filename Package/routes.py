@@ -62,6 +62,24 @@ def get_all_user():
     return jsonify(result)
 
 
+@app.route("/verifyUsername", methods=["POST"])
+def verify_username():
+    user = User.query.filter_by(username=request.json['username']).first()
+    if user:
+        return jsonify({'msg': 'username already exist, choose another one please !!'}), 403
+    else:
+        return jsonify({'msg': 'you can use this username!!'}), 200
+
+
+@app.route("/verifyEmail", methods=["POST"])
+def verify_email():
+    user = User.query.filter_by(email=request.json['email']).first()
+    if user:
+        return jsonify({'msg': 'email already exist, choose another one please !!'}), 403
+    else:
+        return jsonify({'msg': 'you can use this email!!'}), 200
+
+
 @app.route("/user/<user_id>", methods=["GET"])
 def get_one_user(user_id):
     user = User.query.get(user_id)
