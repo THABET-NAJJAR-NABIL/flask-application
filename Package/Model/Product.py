@@ -1,5 +1,4 @@
-from Package import app
-from Package import db
+from Package import app, db
 from datetime import datetime
 from flask_marshmallow import Marshmallow
 

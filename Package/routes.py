@@ -9,9 +9,8 @@ from Package import app, db, bcrypt
 from Package.Model.Product import Product, products_schema, product_schema
 from Package.Model.User import User, users_schema, user_schema
 from Package.Model.Post import Post, post_schema, posts_schema
-
 from flask_cors import CORS, cross_origin
-
+from flask_login import login_user, current_user, logout_user
 cors = CORS(app)
 
 
@@ -58,7 +57,6 @@ def update_user(user_id):
 def get_all_user():
     all_users = User.query.all()
     result = users_schema.dump(all_users)
-    print(result.get('Posts'))
     return jsonify(result)
 
 
@@ -94,14 +92,31 @@ def delete_user(user_id):
     return jsonify(product_schema.dump(user))
 
 
-@app.route('/login')
+@app.route('/login', methods=["POST"])
 def login():
-    auth = request.authorization
-    if auth and auth.password == 'pass':
-        token = jwt.encode({'user': auth.username, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=30)},
+    if not current_user.is_authenticated:
+        user = User.query.filter_by(email=request.json['email']).first()
+        if user and bcrypt.check_password_hash(user.password, request.json['password']):
+            login_user(user)
+            token = jwt.encode({'user': user.email, 'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24)},
                            app.config['SECRET_KEY'])
-        return jsonify({'token': token.decode('UTF-8')})
-    return make_response('Could Verify !', 401, {'WWW-Authenticate': 'Basic realm="Login required"'})
+            return jsonify({'msg': 'Connected', 'token': token.decode('UTF-8')}), 200
+        else:
+            return jsonify({'msg': 'Bad credentials'}), 401
+    else:
+        print('CURRENT USER ID', current_user.admin)
+        return jsonify({'msg': 'Already connected'}), 200
+
+
+@app.route('/logout')
+def logout():
+    logout_user()
+    return jsonify({'msg': 'Session deleted'}), 200
+
+
+@app.route('/isLoggedIn', methods=['GET'])
+def is_logged_in():
+    return jsonify({'is_connected': current_user.is_authenticated}), 200
 
 
 @app.route('/about', methods=['POST'])
