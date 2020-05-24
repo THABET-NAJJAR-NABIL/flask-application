@@ -1,4 +1,3 @@
-import marshmallow as marshmallow
 from flask import Flask, request, jsonify, make_response
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
@@ -182,6 +181,8 @@ def delete_product(id):
     db.session.delete(product)
     db.session.commit()
     return jsonify(product_schema.dump(product))
+
+# Only fr test purpose
 
 
 # Get all products
