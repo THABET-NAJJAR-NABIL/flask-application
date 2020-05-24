@@ -191,6 +191,8 @@ def get_all_products():
     result = products_schema.dump(all_products)
     return jsonify(result)
 
+# 2 Only for test purpose
+
 
 # Get a product by id
 @app.route("/product/<id>", methods=['GET'])
