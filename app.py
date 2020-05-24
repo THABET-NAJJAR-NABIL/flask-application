@@ -191,7 +191,7 @@ def get_all_products():
     result = products_schema.dump(all_products)
     return jsonify(result)
 
-# Only for test purpose /*upgrade*/
+# Only for test purpose /*Master upgraded application*/
 
 
 # Get a product by id
